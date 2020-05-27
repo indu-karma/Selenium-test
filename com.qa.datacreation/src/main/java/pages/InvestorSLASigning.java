@@ -2,6 +2,7 @@ package pages;
 
 import java.util.Properties;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
@@ -17,17 +18,17 @@ public class InvestorSLASigning extends TestBase{
 	WebElement TnCcheckbox;
 	
 	
-	@FindBy(xpath="//button[@class='btn btn-kredx-special']")
+	@FindBy(xpath="//button[text()='Click here to sign']")
 	WebElement SubmitSLA;
 	
 
-	@FindBy(xpath="//btn btn-kredx-primary btn-lg accept-send-otp-button")
+	@FindBy(xpath="//button[text()='Accept And Send OTP']")
 	WebElement AcceptAndSendOTPBtn;
 	
-	@FindBy(id="otp")
+	@FindBy(id="otp")	
 	WebElement otp;
 	
-	@FindBy(xpath="kx-btn kx-btn__primary")
+	@FindBy(xpath="//button[text()='Verify']")
 	WebElement VerifyBtn;
 
 	public InvestorSLASigning(){
@@ -38,10 +39,14 @@ public class InvestorSLASigning extends TestBase{
 	
 	public void SignSLA(){
 		
+		
+		
 		TnCcheckbox.click();
 		SubmitSLA.click();
-		AcceptAndSendOTPBtn.click();
-		otp.sendKeys(prop.getProperty("OTP"));
+		JavascriptExecutor executor = (JavascriptExecutor)driver;
+		executor.executeScript("arguments[0].click()",AcceptAndSendOTPBtn);
+	
+		otp.sendKeys("000000");
 		VerifyBtn.click();
 		
 		

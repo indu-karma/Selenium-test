@@ -1,18 +1,22 @@
 package pages;
 
+
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
+
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
+
 import org.openqa.selenium.support.ui.Select;
 
+
 import base.TestBase;
+import utils.TestUtil;
 
 public class DealCreationPage_Admin extends TestBase{
 	
-	//Select Type = text
-
+	    TestUtil TestUtil;
 		@FindBy(xpath="(//div/select[@type='text'])[1]")
 	    WebElement TypeOfDeal;
 		
@@ -41,40 +45,46 @@ public class DealCreationPage_Admin extends TestBase{
 		
 		@FindBy(xpath="//a[contains(text(),\"Add New Deal\")]")
 		WebElement ClickOnAddNewDeals;
+
+		@FindBy(xpath="//div[@class='breadcrumb']/span[3]/a")
+		WebElement DealUID;
 		
-	
+		
+/*functions of page*/
+public DealCreationPage_Admin(){
+			
+			PageFactory.initElements(driver, this);
+			
+				
+			}
 	
 	
 	//Add new Deal Page
-     public DealUpdationPage CreateDeal(String VendorID, String EnterpriseID, String SelectTypeOfDeal,String LOB) {
+ public DealUpdationPage CreateDeal(String VendorID, String EnterpriseID, String SelectTypeOfDeal,String LOB) {
     	 
-    	driver.manage().timeouts().implicitlyWait(5000,TimeUnit.SECONDS);
-    	SelectDeals.click();
-    	//Actions action = new Actions(driver);
-    	//action.contextClick(SelectDeals).contextClick(ClickOnAddNewDeals).build().perform();
-       //action.moveToElement(SelectDeals).moveToElement(ClickOnAddNewDeals).click().build().perform();
-      
-    	
-  
-    	 ClickOnAddNewDeals.click();
+    	 
+	   
+         SelectDeals.click();
+      	 ClickOnAddNewDeals.click();
     	 
     	 //select type of deal
     	 Select TypeOfDealSelect = new Select(TypeOfDeal);
     	 TypeOfDealSelect.selectByValue(SelectTypeOfDeal);
     	 
-    	 System.out.print("enter2");
+    	 System.out.print("LOB");
     	 Select LineOfBusinessSelect = new Select(LineOfBusiness);
     	 LineOfBusinessSelect.selectByValue(LOB);
     	 
-    	 
-    	 PaidToCompany.sendKeys(VendorID);
-    	 ObligationID.sendKeys(EnterpriseID);
-    	 RecourseOn.sendKeys(VendorID);
-    	 
+    	 TestUtil.selectCompanyID(RecourseOn, VendorID);
+    	 TestUtil.selectCompanyID(ObligationID, EnterpriseID);
+    	 TestUtil.selectCompanyID(PaidToCompany, VendorID);
+    	
     	 Submitbutton.click();
     	 ContinueBtn.click();
     	 
-    	 return new DealUpdationPage();   	 
+    	 //UID provided for Company is invalid
+
+ 		return  new DealUpdationPage();	 
      }	
 
 }

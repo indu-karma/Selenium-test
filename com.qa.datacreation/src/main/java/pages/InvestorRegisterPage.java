@@ -47,8 +47,9 @@ public class InvestorRegisterPage extends TestBase{
 	}
 	
 	
-	public InvestorKYC_upload AddInvestorMainDetails(String Name,String MobNo,String Email,String Pwd,String referralCd)
+	public void AddInvestorMainDetails(String Name,String MobNo,String Email,String Pwd,String referralCd)
 	{
+		
 		investorName.sendKeys(Name);
 		investorMobileNo.sendKeys(MobNo);
 		investorEmailId.sendKeys(Email);
@@ -56,7 +57,7 @@ public class InvestorRegisterPage extends TestBase{
 		termNcondition.click();
 		signUpBtn.click();
 		
-		return new InvestorKYC_upload();
+	
 		
 	}	
 		

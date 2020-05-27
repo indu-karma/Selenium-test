@@ -1,51 +1,79 @@
 package testscripts;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import base.TestBase;
-import pages.AdminLoginPage;
+import pages.LoginPage;
+import utils.TestUtil;
 import pages.DealCreationPage_Admin;
+import pages.DealUpdationPage;
 
 
 public class DealCreationTS extends TestBase{
 	
-	AdminLoginPage Adminlogin;
-	DealCreationPage_Admin dcpa = new DealCreationPage_Admin();
+	
+	LoginPage Adminlogin;
+	DealCreationPage_Admin dcpa; 
+	DealUpdationPage dup;
+	TestUtil TestUtil;
 	
 	public DealCreationTS() {
 			super();
 	}
 	
-	@BeforeMethod	
+	@BeforeClass	
 	public void setUp()
 	{ 
-		initilaization();
-		Adminlogin = new AdminLoginPage();
+	
+		initilaization("Admin");
+		Adminlogin = new LoginPage();
 		Adminlogin.adminLogin(prop.getProperty("username"), prop.getProperty("password"));
 	}
 	    
 	//Add new deal details
-	@Test
+	@Test(priority=1)
 	public void DealCreateNew() throws IOException {
 		
-		dcpa.CreateDeal(prop.getProperty("VendorID"),prop.getProperty("EnterpriseID"),prop.getProperty("TypeOfDeal"),prop.getProperty("LOB"));
+		dcpa = new DealCreationPage_Admin();
+		//TestUtil = new TestUtil();
+		dcpa.CreateDeal(prop.getProperty("VendorID"),
+				prop.getProperty("EnterpriseID"),
+				prop.getProperty("TypeOfDeal"),
+				prop.getProperty("LOB"));
 	}
 	
-	@AfterMethod
+	@Test(priority=2)
+	public void DealUpdatePage() throws IOException, InterruptedException, SQLException {
+	
+		dup=new DealUpdationPage();
+        
+		String dealID=dup.DealUpdateWithInvoice(prop.getProperty("DealApprovedAmount"), 
+        		prop.getProperty("DealTenure"),
+        		prop.getProperty("DealMonthlyDiscountPt"),
+        		prop.getProperty("VendorID"),
+        		prop.getProperty("MinPurchaseAmount"),
+        		prop.getProperty("NoOfInvoice"));
+          System.out.print("\ndeal created as deal id--"+dealID);
+
+        //Deal send for vendor approval
+          
+        dup=new DealUpdationPage();
+		dup.SendForApproval(dealID, prop.getProperty("VendorID"));
+	
+		//Deal sign from Vendor
+		
+	
+	}
+	
+	
+	@AfterClass
 	public void tearDown()
 	{
-		driver.quit();
-	}
-	
-	
-	
-	
-	//public void DealUpdatePage() {}
-	//public void DealAddAssert() {}
-	
-	
+	//	driver.quit();
+	} 
 	
 }

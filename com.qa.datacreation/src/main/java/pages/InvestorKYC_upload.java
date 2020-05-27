@@ -3,13 +3,19 @@ package pages;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import base.TestBase;
 import utils.TestUtil;
@@ -19,16 +25,17 @@ import utils.TestUtil;
 
 public class InvestorKYC_upload extends TestBase{
 
-	public static Properties prop;
+	
+	TestUtil TestUtil;
 	//Web elements	
 
 	@FindBy(xpath="//button[contains(text(),\"VERIFY\")]") 
 	WebElement VerifyMobNo;
 	
-	@FindBy(xpath="") 
+	@FindBy(xpath="//input[@placeholder='Enter OTP']") 
 	WebElement OTP;
 	
-	@FindBy(xpath="") 
+	@FindBy(xpath="//button[text()='Verify']") 
 	WebElement OTPVerifyBtn;
 	
 	
@@ -70,6 +77,12 @@ public class InvestorKYC_upload extends TestBase{
 	@FindBy(xpath="//button[@class='btn btn-kredx-primary center-block']")
 	WebElement IVerifyOTP;
 	
+	@FindBy(xpath="//button[text()='Save & Continue']")
+	WebElement Savebutton;
+	
+	@FindBy(xpath="//span[@class='text-blue']")
+	WebElement InvestorEmail;
+	
 	
 	//Functions	
 		
@@ -80,22 +93,65 @@ public InvestorKYC_upload(){
 	}
 	
 	
-		 
-public static void verifyFinancierEmail(String investorEmailAddress) throws ClassNotFoundException, SQLException {
-
-	System.setProperty("webdriver.chrome.driver", "C:\\Users\\DELL\\Desktop\\Auto_Data creation\\ChromeDriver\\chromedriver.exe");
-	WebDriver driver = new ChromeDriver();
-	driver.manage().window().maximize();
+public String GetInvestorEmailAddress()
+{
+	String InvestorEmailAddess=InvestorEmail.getText();
+	System.out.print("link:---"+InvestorEmailAddess);
+	return InvestorEmailAddess;
 	
-	String investorEmailVerifyURLFront="https://harry.kredx.com/verify-email?uid=";
+
+}
+
+public String verifyFinancierEmailAndMobile(String investorEmailAddress) throws ClassNotFoundException, SQLException {
+
+
+	
+	driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
+	JavascriptExecutor executor = (JavascriptExecutor)driver;
+	executor.executeScript("arguments[0].click()",VerifyMobNo);
+	
+	OTP.sendKeys("000000");
+	
+	driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
+	OTPVerifyBtn.click();
+	String env=prop.getProperty("environment");
+
+	driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
+	String investorEmailVerifyURLFront="https://"+env+".kredx.com/verify-email?uid=";
+	System.out.print("\ninvestorEmailVerifyURLFront:---"+investorEmailVerifyURLFront);
 	String investorUid=TestUtil.getFinancierFrmDb(investorEmailAddress);
+	
+    driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	String investorToken=TestUtil.getTokenFrmDb(investorEmailAddress);
 	String investorUrlBack="&type=USER_REGISTRATION&usertype=financier";
 	String emailVerificationLink=investorEmailVerifyURLFront+investorUid+"&at="+investorToken+investorUrlBack;
-    System.out.print("link:---"+emailVerificationLink);
-
-	driver.get(emailVerificationLink);
-	driver.close();
+	
+	System.out.print("\nlink:---"+emailVerificationLink);
+       
+    Set<String> windows = driver.getWindowHandles();
+    String investorWindow = driver.getWindowHandle();
+    ((JavascriptExecutor)driver).executeScript("window.open();");
+   
+    Set<String> customerWindow = driver.getWindowHandles();
+    customerWindow.removeAll(windows);
+    String customerSiteHandle = ((String)customerWindow.toArray()[0]);
+    driver.switchTo().window(customerSiteHandle);
+    driver.get(emailVerificationLink);
+    driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
+    driver.switchTo().window(investorWindow);
+ 
+	
+	
+	driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+    
+    JavascriptExecutor ec = (JavascriptExecutor)driver;
+  //  ec.executeScript("arguments[0].scrollIntoView(true);", Savebutton);
+	ec.executeScript("arguments[0].click();", Savebutton);
+    
+	
+	
+	Savebutton.click();
+	return investorUid;
 	}
 		
 public void EnterOTP(){
@@ -110,15 +166,20 @@ public void EnterOTP(){
 
 public void UploadPANCardKYCDetails(String dtOfBirth,String PanCard) throws IOException, InterruptedException
 {
+   	
 			 
-			 JavascriptExecutor executor = (JavascriptExecutor)driver;
-			 executor.executeScript("arguments[0].click();", PANCardUploadBtn);
+		      JavascriptExecutor ec = (JavascriptExecutor)driver;
+	    //   ec.executeScript("arguments[0].scrollIntoView(true);", PANCardUploadBtn);
+		   ec.executeScript("arguments[0].click();", PANCardUploadBtn);
+	    
+			//PANCardUploadBtn.click();
+			
 			 driver.manage().timeouts().implicitlyWait(40,TimeUnit.SECONDS);	
 			 Runtime.getRuntime().exec("C:\\Users\\DELL\\Desktop\\Auto_Data creation\\uploadaddress\\fileup.exe");
 			 
 			 InvestorDOB.sendKeys(dtOfBirth);
 			 PANCard.sendKeys(PanCard);
-			
+		//	 Savebutton.click();
 			
 }
 public void UploadAddressKYCDetails(String StreetAdd,String City,String State,String Pincode) throws IOException, InterruptedException{
@@ -128,11 +189,13 @@ public void UploadAddressKYCDetails(String StreetAdd,String City,String State,St
 			IState.sendKeys(State);
 			IPincode.sendKeys(Pincode);
 			//Ibutton.click();
+		  //  TestUtil.scrollToElement(AddressProofUploadBtn);
 			AddressProofUploadBtn.click();
 			Runtime.getRuntime().exec("C:\\Users\\DELL\\Desktop\\Auto_Data creation\\uploadaddress\\fileup.exe");
 			Thread.sleep(2000);
 }
 	
+
 		
 	
 }
