@@ -53,10 +53,10 @@ public class LoginLogoutPage extends TestBase{
 		adminPwd.sendKeys(Pwd);
 		signInBtn.click();
 		driver.manage().timeouts().implicitlyWait(20,TimeUnit.SECONDS);
-	/*	if (EnterOTP!=null) {	
+		if (EnterOTP!=null) {	
 		EnterOTP.sendKeys(prop.getProperty("OTP"));
 		VerifyBtn.click();
-	}*/
+	}
 	//	driver.manage().timeouts().implicitlyWait(20,TimeUnit.SECONDS);
 		//return new AdminDashboardPage();
 	}
