@@ -37,7 +37,7 @@ import base.TestBase;
 
 public class TestUtil extends TestBase{
 
-	public static long PAGE_LOAD_TIMEOUT=20;
+	public static long PAGE_LOAD_TIMEOUT=10;
 	public static long IMPLICIT_LOAD=10;
     protected static WebDriver driver;
     protected String parentWindow;
@@ -87,7 +87,7 @@ public void UploadDocument(WebDriver driver, WebElement ele) throws IOException{
 	executor.executeScript("arguments[0].click()",ele);
 	System.out.print("\ninside upload "); 
 	//ele.click();
-	 driver.manage().timeouts().implicitlyWait(60,TimeUnit.SECONDS);	
+	 driver.manage().timeouts().implicitlyWait(40,TimeUnit.SECONDS);	
 	 Runtime.getRuntime().exec("C:\\Users\\DELL\\Desktop\\Auto_Data creation\\uploadaddress\\fileup.exe");
 }
 
@@ -109,19 +109,7 @@ public static int randomno(){
 	return randomNumber;
 }
 
-public static void selectCompanyID(WebElement CompanyIDXpath,String CompanyID) {
-	
-	Actions builder = new Actions(driver);
-    Action mouseOverHome = builder
-   		 .moveToElement(CompanyIDXpath)
-   		 .clickAndHold()
-   		 .sendKeys(CompanyID)
-   		 .sendKeys(Keys.ARROW_DOWN)
-   		 .sendKeys(Keys.ENTER)
-   		 .build();
-    
-    mouseOverHome.perform();
-}	
+
 
 
 public static String getTokenFrmDb(String investorEmailAddress) throws SQLException, ClassNotFoundException
@@ -212,8 +200,8 @@ public static String CompanyUserEmailID(String VendorUID) throws SQLException
 
 	String VendorEmailID="";
    	String Url = "jdbc:postgresql://dev-staging-rds.culhoehta5zf.ap-south-1.rds.amazonaws.com:5432/ecs_kredx_"+prop.getProperty("environment");
-    String user="vinay";
-    String password="vinay";	
+	String user="qa_user";
+    String password="Qa@Kredx";		
    	String query = "select person_info->'email' from kredx.company_user where company_uid='"+VendorUID+"'";	//Query to Execute	
    	
    	Connection con =null;
@@ -250,14 +238,137 @@ public static String CompanyUserEmailID(String VendorUID) throws SQLException
 
 }
 
+/*-----------------------------Deal TransactionID---------------------------------------------------*/
 
-public static void UpdatePlatformListingDate(String DealID) throws SQLException {
+public static String DealTransactionID(String DealID) throws SQLException
+{
+	
+	//select person_info->'email' from kredx.company_user where company_uid='COGL4XPEDMK3'
+	
+
+	String DealTxnID="";
+   	String Url = "jdbc:postgresql://dev-staging-rds.culhoehta5zf.ap-south-1.rds.amazonaws.com:5432/ecs_kredx_"+prop.getProperty("environment");
+	String user="qa_user";
+    String password="Qa@Kredx";		
+   	String query = "Select uid from kredx.deal_transactions where deal_uid='"+DealID+"'";	//Query to Execute	
+   
+   	Connection con =null;
+   	
+   	try {
+            Class.forName("org.postgresql.Driver");
+        }
+    catch (java.lang.ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }	 	
+
+   	try {
+		con = DriverManager.getConnection(Url,user,password); //Create Connection to DB	
+		System.out.println("Connected to the PostgreSQL server successfully.");
+		}
+	catch (SQLException e){
+		System.out.println(e.getMessage());
+		}
+   
+   Statement stmt= con.createStatement();   //Create Statement Object					
+   ResultSet rs= stmt.executeQuery(query);	// Execute the SQL Query. Store results in ResultSet						
+
+   if (rs.next()) {
+	   DealTxnID=rs.getString(1);
+   }
+		
+   rs.close();
+   stmt.close();
+   con.close();  // closing DB Connection
+
+		
+	return DealTxnID;
+	
+
+}
+
+
+/*------------------------------------------------------------------------------------------*/
+
+
+public void UpdatePlatformListingDate(String DealID) throws SQLException {
 	
    	String Url = "jdbc:postgresql://dev-staging-rds.culhoehta5zf.ap-south-1.rds.amazonaws.com:5432/ecs_kredx_"+prop.getProperty("environment");
-    String user="vinay";
-    String password="vinay";	
+	String user="qa_user";
+    String password="Qa@Kredx";		
    	String query = "update kredx.deals set platform_listing_date=now() where uid ='"+DealID+"'";	//Query to Execute	
    	
+   	Connection con =null;
+   	
+   	try {
+            Class.forName("org.postgresql.Driver");
+        }
+    catch (java.lang.ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }	 	
+
+   	try {
+		con = DriverManager.getConnection(Url,user,password); //Create Connection to DB	
+		System.out.println("Connected to the PostgreSQL server successfully.");
+		}
+	catch (SQLException e){
+		System.out.println(e.getMessage());
+		}
+   
+   Statement stmt= con.createStatement();   //Create Statement Object					
+   ResultSet rs= stmt.executeQuery(query);	// Execute the SQL Query. Store results in ResultSet						
+
+ 	
+   rs.close();
+   stmt.close();
+   con.close();  // closing DB Connection
+	
+	
+}
+
+public static void UpdateListingDate(String DealID) throws SQLException {
+	
+   	String Url = "jdbc:postgresql://dev-staging-rds.culhoehta5zf.ap-south-1.rds.amazonaws.com:5432/ecs_kredx_"+prop.getProperty("environment");
+	String user="qa_user";
+    String password="Qa@Kredx";		
+   	String query = "update kredx.deals set listing_date = listing_date - interval '90 days' where uid ='"+DealID+"'";	//Query to update listing date	
+   
+   	Connection con =null;
+   	
+   	try {
+            Class.forName("org.postgresql.Driver");
+        }
+    catch (java.lang.ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }	 	
+
+   	try {
+		con = DriverManager.getConnection(Url,user,password); //Create Connection to DB	
+		System.out.println("Connected to the PostgreSQL server successfully.");
+		}
+	catch (SQLException e){
+		System.out.println(e.getMessage());
+		}
+   
+   Statement stmt= con.createStatement();   //Create Statement Object					
+   ResultSet rs= stmt.executeQuery(query);	// Execute the SQL Query. Store results in ResultSet						
+
+ 	
+   rs.close();
+   stmt.close();
+   con.close();  // closing DB Connection
+	
+	
+}
+
+public static void UpdateDueDate(String DealID) throws SQLException {
+	
+   	String Url = "jdbc:postgresql://dev-staging-rds.culhoehta5zf.ap-south-1.rds.amazonaws.com:5432/ecs_kredx_"+prop.getProperty("environment");
+	String user="qa_user";
+    String password="Qa@Kredx";		
+   	String query = "update kredx.deal_transactions set executed_date = executed_date - interval '90 days', "
+   			+ "txn_date = txn_date - interval '90 days', due_date = due_date - interval '90 days' "
+   			+ "where deal_uid = '"+DealID+"'";	//Query to update executed,transaction and due date	
+   
    	Connection con =null;
    	
    	try {
@@ -362,7 +473,7 @@ public String generateNumber()
     return String.valueOf( value );
 }
 
-public String generateRandomNamePancardNumber() {
+public static String generateRandomNamePancardNumber() {
 	Random rand = new Random(); 
     int panno = rand.nextInt(10000); 
     
@@ -376,6 +487,9 @@ public String generateRandomNamePancardNumber() {
     String panCardNumber=password+panno+"M";
     return panCardNumber;
 }
+
+
+
 
 public static void waitForElement(WebElement element) {
     try {
@@ -426,11 +540,12 @@ protected static void waitFor(int pollingDuration) {
     }
 }
 
-public void clickOnElement(WebElement element) {
+public static void clickOnElement(WebElement element) {
     System.out.println("Clicking on element: " + element);
     waitForElement(element);
     element.click();
 }
+
 
 public void writeTextInField(WebElement webElement, String text) {
     System.out.println("Typing :" + text + ", on element: " + webElement);

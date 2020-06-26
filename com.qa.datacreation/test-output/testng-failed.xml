@@ -5,7 +5,6 @@
     <classes>
       <class name="testscripts.DealCreationTS">
         <methods>
-          <include name="DealCreateNew"/>
           <include name="tearDown"/>
           <include name="setUp"/>
           <include name="DealUpdatePage"/>

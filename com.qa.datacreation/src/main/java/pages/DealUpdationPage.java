@@ -4,24 +4,32 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import base.TestBase;
 import pages.AddInvoicePage_Admin;
 import utils.TestUtil;
 
+
 public class DealUpdationPage extends TestBase {
 	
 	AddInvoicePage_Admin invoicepage;
-	LoginPage Vendorlogin;
-	TestUtil TestUtils;
-	
+	LoginLogoutPage Vendorlogin;
+	LoginLogoutPage Adminlogin;
+	TestUtil TestUtil;
+	DealCreationPage_Admin DcP;
+	String DealdPrint = null;
 
 	@FindBy(xpath="(//input[@type='text'])[2]")
 	WebElement ApprovedAmount;
@@ -68,7 +76,7 @@ public class DealUpdationPage extends TestBase {
 	@FindBy(xpath="//button[@class='rrt-button rrt-ok-btn toastr-control']")
 	WebElement OKDealBtn;
 	
-	@FindBy(xpath="(//button[@class='btn btn-kredx-secondary mls'])[2]")
+	@FindBy(xpath="//button[contains(text(),'Send For Approval')]")
 	WebElement SendForApprovalBtn;
 	
 	@FindBy(xpath="(//a[contains(text(),'Deals')])[1]")
@@ -148,43 +156,42 @@ public String DealUpdateWithoutInvoice(String DealApprovedAmount,String DealTenu
 	}
 	
 	
-	public String DealUpdateWithInvoice(String DealApprovedAmount,String DealTenure,String DealMonthlyDiscountPt,String AddCostBorneBy, String MinPurAmt,String NoOfInvoice) throws IOException, InterruptedException {
+public String DealUpdateWithInvoice(String DealApprovedAmount,String DealTenure,String DealMonthlyDiscountPt,String AddCostBorneBy, String MinPurAmt,String NoOfInvoice) throws IOException, InterruptedException {
 		
-		
-		String DealId = null;
 		invoicepage = new AddInvoicePage_Admin();
+		TestUtil= new TestUtil();
 		
 		ApprovedAmount.click();
-		//ApprovedAmount.sendKeys(Keys.BACK_SPACE);
+		ApprovedAmount.sendKeys(Keys.BACK_SPACE);
 		ApprovedAmount.sendKeys(DealApprovedAmount);
+		
 		
 		Tenure.click();
 		Tenure.sendKeys(Keys.CONTROL,"a");
-		Tenure.sendKeys(Keys.DELETE);
+		Tenure.sendKeys(Keys.BACK_SPACE);
 		Tenure.sendKeys(DealTenure);
 		
 		MonthlyDiscountPt.sendKeys(Keys.BACK_SPACE);
 	    MonthlyDiscountPt.sendKeys(DealMonthlyDiscountPt);
 		
-	    //MinAmountPurchase.sendKeys(Keys.BACK_SPACE);
+	    MinAmountPurchase.sendKeys(Keys.BACK_SPACE);
 		MinAmountPurchase.sendKeys(MinPurAmt);
 		
 		SaveDeal.click();
+	
+		//selectCompanyID(CostBorneBy, AddCostBorneBy);
+		
+		//Add Invoice	
+	
 		
 		driver.manage().timeouts().implicitlyWait(40,TimeUnit.SECONDS);
 		
-   //    for (int i=1;i<=Integer.parseInt(NoOfInvoice);i++) {
-		
-	//	if (i == 1) {
+ 			
 			
-		//	System.out.println("i=="+i);
-			
-			
-			
-			String IUID=invoicepage.AddAsset(prop.getProperty("LOB"),
-					prop.getProperty("VendorID"),
-					prop.getProperty("EnterpriseID"));
-			System.out.print("\nIUID--"+IUID);
+	String IUID=invoicepage.AddAsset(prop.getProperty("LOB"),
+			prop.getProperty("VendorID"),
+	    	prop.getProperty("EnterpriseID"));
+	System.out.print("\nIUID--"+IUID);
 	
 			JavascriptExecutor executor = (JavascriptExecutor)driver;
 			executor.executeScript("arguments[0].click()",SingleInvoiceClk);
@@ -197,33 +204,22 @@ public String DealUpdateWithoutInvoice(String DealApprovedAmount,String DealTenu
 			InvoiceUID.click();
 			InvoiceUID.sendKeys(IUID);
 		
-		//}
-		//*else {
-		//		MultipleInvoiceClk.click(); }
-	    		
-		  //      InvoiceUID.sendKeys(invoicepage.AddAsset(prop.getProperty("LOB"), 
-	     //		prop.getProperty("VendorID"),
-	     	//	prop.getProperty("EnterpriseID")));
-	//}	
-		
-			
-			
-        TestUtils.UploadDocument(driver, UploadDealReport);
+	   TestUtil.UploadDocument(driver, UploadDealReport);
+       // driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
 					
-		SaveDeal.click();
-		OKDealBtn.click();
+		
 		
 		Thread.sleep(5000);
 		SaveDeal.click();
-
-		DealId=DealUID.getText();
-		System.out.print("Deal ID--"+DealId);
-		return DealId;
+		OKDealBtn.click();
+		DealdPrint=DealUID.getAttribute("innerHTML");
+		System.out.print("Deal ID--"+DealdPrint);
+		return DealdPrint;
 	}
 	
-	public void SendForApproval(String DealID, String VendorID) throws SQLException {
+	public void SendForApproval(String DealID, String VendorID) throws SQLException, InterruptedException {
 		
-		driver.getCurrentUrl();
+		//driver.getCurrentUrl();
 		
 		if(DealID!=DealUID.getText() && SendForApprovalBtn.isEnabled()!=true) {
 			
@@ -239,30 +235,57 @@ public String DealUpdateWithoutInvoice(String DealApprovedAmount,String DealTenu
 			
 				
 		}
+		System.out.print("\nvendor id:--"+VendorID);
+		driver.manage().timeouts().implicitlyWait(60,TimeUnit.SECONDS);
+		WebDriverWait wait = new WebDriverWait(driver,30);
+		wait.until(ExpectedConditions.elementToBeClickable(SendForApprovalBtn));		
 		
+		Thread.sleep(5000);
 		SendForApprovalBtn.click();
 		
-		DealSignFromVendor(VendorID);
-		//verify deal status
 		
-		
-	}
+		driver.manage().timeouts().implicitlyWait(40,TimeUnit.SECONDS);
+			
+}
 	
-   public void DealSignFromVendor(String vendorID) throws SQLException
+   public void DealSignFromVendor(String DealID,String vendorID) throws Exception
    {
-	   initilaization_Vendor();
-	   Vendorlogin = new LoginPage();
-       Vendorlogin.adminLogin(TestUtil.CompanyUserEmailID(vendorID), prop.getProperty("vendorPassword"));
-	  
-       ClickOnNotification.click();
-       SignAgreementBtn.click();
-       ClickHereToSignBtn.click();
+	    
+    	
+	    String AgreementURL="//https://"+prop.getProperty("environment")+".kredx.com/vendor/dashboard/deals/"+DealID+"/agreement";
+	   
+        System.out.print("\nAgreement:--"+AgreementURL);
+	    driver.get(AgreementURL);
+	    //ClickOnNotification.click();
+        SignAgreementBtn.click();
+        ClickHereToSignBtn.click();
+        driver.switchTo().activeElement();
+        AcceptAndSendOTPBtn.click();
+        // AcceptAndSendOTPBtn.click();
        
-       driver.close();
-	 	    
+        EnterOTP.sendKeys("000000");
+        VerifyBtn.click();
+       
+        Vendorlogin.logout(); 
 	   
    }
    
+   
+   public static void selectCompanyID(WebElement CompanyIDXpath,String CompanyID) {
+		
+	//org.openqa.selenium.interactions.Actions builder = new org.openqa.selenium.interactions.Actions(driver);
+	   
+		Actions builder = new Actions(driver);
+	    Action mouseOverHome = builder
+	   		 .moveToElement(CompanyIDXpath)
+	   		 .clickAndHold()
+	   		 .sendKeys(CompanyID)
+	   		 .sendKeys(Keys.ARROW_DOWN)
+	   		 .sendKeys(Keys.ENTER)
+	   		 .build();
+	    
+	    mouseOverHome.perform();
+	}
    	
 	
 	
@@ -276,7 +299,7 @@ public String DealUpdateWithoutInvoice(String DealApprovedAmount,String DealTenu
 
 	public void DealLiveOnPlatform(String DealID) throws SQLException
 	{
-		TestUtils.UpdatePlatformListingDate(DealID);  
+		TestUtil.UpdatePlatformListingDate(DealID);  
 		
 	}
 	

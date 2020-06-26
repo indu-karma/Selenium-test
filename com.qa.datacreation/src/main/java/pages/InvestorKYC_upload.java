@@ -26,7 +26,7 @@ import utils.TestUtil;
 public class InvestorKYC_upload extends TestBase{
 
 	
-	TestUtil TestUtil;
+
 	//Web elements	
 
 	@FindBy(xpath="//button[contains(text(),\"VERIFY\")]") 
@@ -166,11 +166,10 @@ public void EnterOTP(){
 
 public void UploadPANCardKYCDetails(String dtOfBirth,String PanCard) throws IOException, InterruptedException
 {
-   	
 			 
 		      JavascriptExecutor ec = (JavascriptExecutor)driver;
-	    //   ec.executeScript("arguments[0].scrollIntoView(true);", PANCardUploadBtn);
-		   ec.executeScript("arguments[0].click();", PANCardUploadBtn);
+		      ec.executeScript("arguments[0].scrollIntoView(true);", PANCardUploadBtn);
+		      ec.executeScript("arguments[0].click();", PANCardUploadBtn);
 	    
 			//PANCardUploadBtn.click();
 			
@@ -184,15 +183,18 @@ public void UploadPANCardKYCDetails(String dtOfBirth,String PanCard) throws IOEx
 }
 public void UploadAddressKYCDetails(String StreetAdd,String City,String State,String Pincode) throws IOException, InterruptedException{
 			
-			IStreetAdd.sendKeys(StreetAdd);
-			ICity.sendKeys(City);
-			IState.sendKeys(State);
-			IPincode.sendKeys(Pincode);
+	
+		//IStreetAdd.sendKeys(StreetAdd);
+	    TestUtil.waitForElement(IStreetAdd);	
+		IStreetAdd.sendKeys(StreetAdd);
+		ICity.sendKeys(City);
+		IState.sendKeys(State);
+		IPincode.sendKeys(Pincode);
 			//Ibutton.click();
 		  //  TestUtil.scrollToElement(AddressProofUploadBtn);
-			AddressProofUploadBtn.click();
-			Runtime.getRuntime().exec("C:\\Users\\DELL\\Desktop\\Auto_Data creation\\uploadaddress\\fileup.exe");
-			Thread.sleep(2000);
+		AddressProofUploadBtn.click();
+		Runtime.getRuntime().exec("C:\\Users\\DELL\\Desktop\\Auto_Data creation\\uploadaddress\\fileup.exe");
+		Thread.sleep(2000);
 }
 	
 

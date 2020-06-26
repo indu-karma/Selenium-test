@@ -28,7 +28,7 @@ public class VendorOnboardingTS extends TestBase{
 	@BeforeClass	
 	public void setUp()
 	{ 
-		initilaization_Vendor();
+		initilaization("Vendor");
 		
 	}
 	    

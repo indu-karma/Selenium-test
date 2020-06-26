@@ -3,8 +3,10 @@ package pages;
 
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
@@ -16,7 +18,7 @@ import utils.TestUtil;
 
 public class DealCreationPage_Admin extends TestBase{
 	
-	    TestUtil TestUtil;
+	//    TestUtil TestUtil;
 		@FindBy(xpath="(//div/select[@type='text'])[1]")
 	    WebElement TypeOfDeal;
 		
@@ -75,9 +77,9 @@ public DealCreationPage_Admin(){
     	 Select LineOfBusinessSelect = new Select(LineOfBusiness);
     	 LineOfBusinessSelect.selectByValue(LOB);
     	 
-    	 TestUtil.selectCompanyID(RecourseOn, VendorID);
-    	 TestUtil.selectCompanyID(ObligationID, EnterpriseID);
-    	 TestUtil.selectCompanyID(PaidToCompany, VendorID);
+    	 selectCompanyID(RecourseOn, VendorID);
+    	 selectCompanyID(ObligationID, EnterpriseID);
+    	 selectCompanyID(PaidToCompany, VendorID);
     	
     	 Submitbutton.click();
     	 ContinueBtn.click();
@@ -87,4 +89,18 @@ public DealCreationPage_Admin(){
  		return  new DealUpdationPage();	 
      }	
 
+ public static void selectCompanyID(WebElement CompanyIDXpath,String CompanyID) {
+		
+		Actions builder = new Actions(driver);
+	    Action mouseOverHome = builder
+	   		 .moveToElement(CompanyIDXpath)
+	   		 .clickAndHold()
+	   		 .sendKeys(CompanyID)
+	   		 .sendKeys(Keys.ARROW_DOWN)
+	   		 .sendKeys(Keys.ENTER)
+	   		 .build();
+	    
+	    mouseOverHome.perform();
+	}	
+ 
 }

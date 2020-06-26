@@ -1,12 +1,16 @@
 package base;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import org.codehaus.plexus.util.FileUtils;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.PageLoadStrategy;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -43,16 +47,16 @@ public static void initilaization(String user) {
 		
 		
 		if (browserName.equals("chrome")){
-			System.setProperty("webdriver.chrome.driver", "C:\\Users\\DELL\\Desktop\\Auto_Data creation\\ChromeDriver\\chromedriver.exe");	
+			System.setProperty("webdriver.chrome.driver", "C:\\Program Files (x86)\\Jenkins\\chromedriver.exe");	
 			//mention the below chrome option to solve timeout exception issue
-			ChromeOptions options = new ChromeOptions();
-			options.setPageLoadStrategy(PageLoadStrategy.NONE);
+		//	ChromeOptions options = new ChromeOptions();
+		//	options.setPageLoadStrategy(PageLoadStrategy.NONE);
 			driver= new ChromeDriver();
 		}
 		driver.manage().window().maximize();
 		driver.manage().deleteAllCookies();
-		driver.manage().timeouts().pageLoadTimeout(TestUtil.PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
-		driver.manage().timeouts().implicitlyWait(TestUtil.IMPLICIT_LOAD, TimeUnit.SECONDS);
+//		driver.manage().timeouts().pageLoadTimeout(TestUtil.PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
+	//	driver.manage().timeouts().implicitlyWait(TestUtil.IMPLICIT_LOAD, TimeUnit.SECONDS);
 		
 					
 		if (user=="Admin" ||user=="Userlogin") {
@@ -64,6 +68,7 @@ public static void initilaization(String user) {
 		}else if(user=="Investor"){
 			url="https://"+env+".kredx.com/financier/register";
 			driver.get(url);
+		
 		} else {
 			
 			System.out.print("you have not selected user");
@@ -73,67 +78,24 @@ public static void initilaization(String user) {
 
 
 	
-	public static void initilaization_Admin() {
-		
-		String browserName=prop.getProperty("browser");
-		String url=prop.getProperty("url");
-		System.out.println("url"+url);
-		
-		if (browserName.equals("chrome")){
-			System.setProperty("webdriver.chrome.driver", "C:\\Users\\DELL\\Desktop\\Auto_Data creation\\ChromeDriver\\chromedriver.exe");	
-			//mention the below chrome option to solve timeout exception issue
-			ChromeOptions options = new ChromeOptions();
-			options.setPageLoadStrategy(PageLoadStrategy.NONE);
-			driver= new ChromeDriver();
-		}
-		driver.manage().window().maximize();
-		driver.manage().deleteAllCookies();
-		driver.manage().timeouts().pageLoadTimeout(TestUtil.PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
-		driver.manage().timeouts().implicitlyWait(TestUtil.IMPLICIT_LOAD, TimeUnit.SECONDS);
-		driver.get(prop.getProperty("url"));
-		
-	}
+	
 
-    public static void initilaization_Vendor() {
-		
-		String browserName=prop.getProperty("browser");
-		String url=prop.getProperty("Vendor_url");
-		System.out.println("url"+url);
-		
-		if (browserName.equals("chrome")){
-			System.setProperty("webdriver.chrome.driver", "C:\\Users\\DELL\\Desktop\\Auto_Data creation\\ChromeDriver\\chromedriver.exe");	
-			//mention the below chrome option to solve timeout exception issue
-			ChromeOptions options = new ChromeOptions();
-			options.setPageLoadStrategy(PageLoadStrategy.NONE);
-			driver= new ChromeDriver();
-		}
-		driver.manage().window().maximize();
-		driver.manage().deleteAllCookies();
-		driver.manage().timeouts().pageLoadTimeout(TestUtil.PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
-		driver.manage().timeouts().implicitlyWait(TestUtil.IMPLICIT_LOAD, TimeUnit.SECONDS);
-		driver.get(url);
-		
-	}
     
- public static void initilaization_Investor() {
+    
+ 
+ 
+ public String takeScreenshot(WebDriver driver) throws IOException {		
+		TakesScreenshot ts = (TakesScreenshot)driver;		
+		//Taking screenshot
+		File Screenshot = ts.getScreenshotAs(OutputType.FILE);
+		//Creating the path to save the file
+		String destinationPath = System.getProperty("user.dir")+"\\Screenshots\\img_name.png";		
+		//creating destination file to save the screenshot
+		File destinationFile = new File(destinationPath);
+		//copying Screenshot to destination file
+		FileUtils.copyFile(Screenshot, destinationFile);
 		
-		String browserName=prop.getProperty("browser");
-		String url=prop.getProperty("Investor_url");
-		System.out.println("url"+url);
-		
-		if (browserName.equals("chrome")){
-			System.setProperty("webdriver.chrome.driver", "C:\\Users\\DELL\\Desktop\\Auto_Data creation\\ChromeDriver\\chromedriver.exe");	
-			//mention the below chrome option to solve timeout exception issue
-			ChromeOptions options = new ChromeOptions();
-			options.setPageLoadStrategy(PageLoadStrategy.NONE);
-			driver= new ChromeDriver();
-		}
-		driver.manage().window().maximize();
-		driver.manage().deleteAllCookies();
-		driver.manage().timeouts().pageLoadTimeout(TestUtil.PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
-		driver.manage().timeouts().implicitlyWait(TestUtil.IMPLICIT_LOAD, TimeUnit.SECONDS);
-		driver.get(url);
-		
+		return destinationPath;		
 	}
 
 

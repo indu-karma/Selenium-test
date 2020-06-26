@@ -7,7 +7,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import base.TestBase;
-import pages.LoginPage;
+import pages.LoginLogoutPage;
 import utils.TestUtil;
 import pages.DealCreationPage_Admin;
 import pages.DealUpdationPage;
@@ -16,7 +16,7 @@ import pages.DealUpdationPage;
 public class DealCreationTS extends TestBase{
 	
 	
-	LoginPage Adminlogin;
+	LoginLogoutPage Adminlogin;
 	DealCreationPage_Admin dcpa; 
 	DealUpdationPage dup;
 	TestUtil TestUtil;
@@ -30,7 +30,7 @@ public class DealCreationTS extends TestBase{
 	{ 
 	
 		initilaization("Admin");
-		Adminlogin = new LoginPage();
+		Adminlogin = new LoginLogoutPage();
 		Adminlogin.adminLogin(prop.getProperty("username"), prop.getProperty("password"));
 	}
 	    
@@ -39,7 +39,6 @@ public class DealCreationTS extends TestBase{
 	public void DealCreateNew() throws IOException {
 		
 		dcpa = new DealCreationPage_Admin();
-		//TestUtil = new TestUtil();
 		dcpa.CreateDeal(prop.getProperty("VendorID"),
 				prop.getProperty("EnterpriseID"),
 				prop.getProperty("TypeOfDeal"),
@@ -47,7 +46,7 @@ public class DealCreationTS extends TestBase{
 	}
 	
 	@Test(priority=2)
-	public void DealUpdatePage() throws IOException, InterruptedException, SQLException {
+	public void DealUpdatePage() throws Exception {
 	
 		dup=new DealUpdationPage();
         
@@ -59,14 +58,25 @@ public class DealCreationTS extends TestBase{
         		prop.getProperty("NoOfInvoice"));
           System.out.print("\ndeal created as deal id--"+dealID);
 
-        //Deal send for vendor approval
-          
-        dup=new DealUpdationPage();
-		dup.SendForApproval(dealID, prop.getProperty("VendorID"));
+        /*--------------------------Deal send for vendor approval--------------------*/
+        System.out.print("\nvendor id--"+prop.getProperty("VendorID"));  
+     	dup.SendForApproval(dealID, prop.getProperty("VendorID"));
+     	Adminlogin.adminLogout();
 	
-		//Deal sign from Vendor
+		/*---------------------Deal sign from Vendor--------------------------------*/
+     	String emailid=utils.TestUtil.CompanyUserEmailID(prop.getProperty("VendorID"));
+	    String VendorEMailID= emailid.replaceAll("^\"|\"$", "");
+    	Adminlogin.adminLogin(VendorEMailID,prop.getProperty("userPassword"));
+     	
+     	dup.DealSignFromVendor(dealID,prop.getProperty("VendorID"));
+     
+     	dup.ListDealOnPlatform();
+     	
+    	dup.DealLiveOnPlatform(dealID);
+     	
+    	
+     	//DE20WO26X9
 		
-	
 	}
 	
 	
